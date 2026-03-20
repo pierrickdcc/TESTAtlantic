@@ -33,7 +33,7 @@ export const useChartData = (pair: number = 0, interval: string = "300") => {
           // 1. ON INTERCEPTE L'ERREUR SUPRA ICI
           if (result && result.error) {
             console.warn("L'API a renvoyé une erreur (ex: Supra) :", result.error);
-            setData([]); // On donne un tableau vide pour empêcher le crash !
+            setData((prevData) => (prevData.length === 0 ? prevData : [])); // On donne un tableau vide pour empêcher le crash !
           } 
           // 2. Si c'est bien un tableau (crypto), on l'enregistre
           else if (Array.isArray(result)) {
@@ -41,12 +41,12 @@ export const useChartData = (pair: number = 0, interval: string = "300") => {
           } 
           // 3. Sécurité supplémentaire si c'est autre chose
           else {
-            setData([]);
+            setData((prevData) => (prevData.length === 0 ? prevData : []));
           }
         }
       } catch (error) {
         console.error('Erreur lors du fetch des données:', error);
-        if (isMounted) setData([]); // En cas de crash réseau, on met un tableau vide
+        if (isMounted) setData((prevData) => (prevData.length === 0 ? prevData : [])); // En cas de crash réseau, on met un tableau vide
       } finally {
         if (isMounted) setLoading(false);
       }

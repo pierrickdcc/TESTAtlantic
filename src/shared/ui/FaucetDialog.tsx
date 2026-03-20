@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import React, { useState, useEffect } from 'react';
 import { Droplet, DollarSign, CheckCircle, Wallet, ArrowDownToLine } from 'lucide-react'; 

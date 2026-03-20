@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import { Toaster } from "@/shared/ui/toaster";
 import { Toaster as Sonner } from "@/shared/ui/sonner";
