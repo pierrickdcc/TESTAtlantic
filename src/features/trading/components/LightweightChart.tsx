@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import { useEffect, useRef, useMemo, useState } from 'react';
 import { 
@@ -35,12 +34,14 @@ interface LightweightChartProps {
   data: ChartData[];
   positions?: Position[];
   isPositionsCollapsed?: boolean; 
+  isRightPanelOpen?: boolean;
 }
 
 export const LightweightChart = ({ 
   data, 
   positions = [], 
-  isPositionsCollapsed 
+  isPositionsCollapsed,
+  isRightPanelOpen
 }: LightweightChartProps) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   
@@ -180,19 +181,16 @@ export const LightweightChart = ({
         });
       };
 
-      const t1 = setTimeout(performResize, 70);
-      const t2 = setTimeout(performResize, 150);
-      const t3 = setTimeout(() => {
-        performResize();
-      }, 300); 
+      // Ensure chart follows the CSS transition smoothly by resizing at key intervals
+      const intervals = [15, 50, 100, 150, 200, 250, 300, 350].map((delay) =>
+        setTimeout(performResize, delay)
+      );
 
       return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-        clearTimeout(t3);
+        intervals.forEach(clearTimeout);
       };
     }
-  }, [isPositionsCollapsed]);
+  }, [isPositionsCollapsed, isRightPanelOpen]);
 
 
   // ---------------------------------------------------------

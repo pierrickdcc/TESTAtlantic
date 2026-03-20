@@ -1,11 +1,11 @@
 "use client";
-"use client";
 import React, { useState, useMemo, useEffect } from "react";
 import OrderPanel from "./OrderPanel";
 import { LightweightChart } from "./LightweightChart";
 import { ChartControls, Asset } from "./ChartControls";
 import { useChartData } from "@/features/trading/hooks/useChartData";
 import { usePositions } from "@/features/trading/hooks/usePositions";
+import { usePriceStats } from "@/features/trading/hooks/usePriceStats";
 import { useWebSocket } from "@/shared/hooks/useWebSocket";
 import PositionsSection from "./PositionsSection"; 
 import { BottomBar } from "@/shared/ui/BottomBar";
@@ -50,41 +50,8 @@ const TradingSection = () => {
     return null;
   }, [wsData, selectedAsset.pair]);
 
-  const { priceChange, priceChangePercent, aggregatedCurrentPrice } = useMemo(() => {
-    const currentPriceUsed =
-      currentWsPrice ||
-      (data.length > 0 ? parseFloat(data[data.length - 1].close) : 0);
-
-    if (data.length < 2 || currentPriceUsed === 0) {
-      return { priceChange: 0, priceChangePercent: 0, aggregatedCurrentPrice: currentPriceUsed };
-    }
-
-    const firstPrice = parseFloat(data[0].open);
-    const change = currentPriceUsed - firstPrice;
-    const changePercent = (change / firstPrice) * 100;
-
-    return {
-      priceChange: change,
-      priceChangePercent: changePercent,
-      aggregatedCurrentPrice: currentPriceUsed,
-    };
-  }, [data, currentWsPrice]);
+  const { priceChange, priceChangePercent, aggregatedCurrentPrice } = usePriceStats(data, currentWsPrice);
   
-  useEffect(() => {
-    // Force ChartResize during right panel transition
-    const interval = setInterval(() => {
-        window.dispatchEvent(new Event('resize'));
-    }, 15);
-    const timeout = setTimeout(() => {
-        clearInterval(interval);
-        window.dispatchEvent(new Event('resize'));
-    }, 350);
-    return () => {
-        clearInterval(interval);
-        clearTimeout(timeout);
-    };
-  }, [isRightPanelOpen]);
-
   const finalCurrentPrice = currentWsPrice || aggregatedCurrentPrice;
   const finalPositionsHeight = isPositionsCollapsed ? `${MIN_HEIGHT}px` : INITIAL_HEIGHT_PERCENTAGE; 
 
@@ -142,6 +109,7 @@ const TradingSection = () => {
                             data={data}
                             positions={positions}
                             isPositionsCollapsed={isPositionsCollapsed}
+                            isRightPanelOpen={isRightPanelOpen}
                         />
                     )}
                 </div>
